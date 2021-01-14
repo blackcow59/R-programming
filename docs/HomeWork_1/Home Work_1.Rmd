@@ -1,0 +1,22 @@
+---
+title: "Home Work_1"
+author: "Hojin Choe"
+date: '2020 3 27 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 자기소개 및 목표
+ 안녕하십니까 저는 정보통계학과 17학번(201701194) 최호진이라고 합니다. 생년월일은 다른 17학번 학생들과 같은 98년생이지만 저는 재수를 해서 입학한 흔히 말하는 빠른 년생입니다. 군대를 갔다 오니 지금까지 학습했던 내용의 대부분을 잊어버려서 3월 들어서 다시 열심히 공부하고 있습니다. 저는 통계학이라는 학문이 제 적성과 잘 맞고 재밌다고 느껴져서 이번 '통계 프로그래밍 언어'수업을 통해 R에 대한 이해도를 높여 능수능란하게 사용하기 위한 기반을 단단히 다지고 싶습니다.
+
+## RStudio setting
+![](../figures/RStudio setting.png)
+
+## cars 데이터셋의 2차원 산점도
+```{r}
+require(ggplot2)
+ggplot(data=cars,aes(x=speed, y=dist)) + geom_point(size=3,colour="skyblue")
+```

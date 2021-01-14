@@ -1,0 +1,24 @@
+{
+    "id": "66A2009B",
+    "path": "C:/r-project/R-programming/script/R_programming_example.R",
+    "project_path": "script/R_programming_example.R",
+    "type": "r_source",
+    "hash": "3330128457",
+    "contents": "",
+    "dirty": false,
+    "created": 1601545292294.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "cursorPosition": "38,28",
+        "scrollLine": "24"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1601545317,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1601545317939,
+    "read_only": false,
+    "read_only_alternatives": []
+}

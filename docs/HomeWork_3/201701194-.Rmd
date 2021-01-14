@@ -1,0 +1,321 @@
+---
+title: "Homework #3"
+subtitle: "충남대학교, 정보통계학과, 201701194"
+author: "최호진"
+date: "`r paste('제출일자:', Sys.Date())`"
+output: 
+  html_document: 
+    df_print: paged
+
+---
+  
+  
+## Homework #3
+
+
+**1. 2.5절 배열에서 다룬 확장 예제 "RGB값을 무작위로 샘플링 후 매개변수로 노이즈 가중치 조절해 보기" 명령 스크립트 중 다음아래에 해당하는 구문의 반복 명령을 최소화한 스크립트 작성 후 해당 스크립트가 정상적으로 작동하는지 그림 출력을 통해 확인하시오. 단, 그림은 2.5절 예제와 동일한 그림을 사용(Hint: `*apply()` 계열 함수, 코드블록(`{}`), `return()`, `unlist()`, `array()` 함수 사용)**
+
+```{r eval=FALSE}
+require(tidyverse)
+require(jpeg)
+require(cowplot)
+
+myurl <- paste0("https://img.livescore.co.kr/data/editor/1906/", 
+                "ba517de8162d92f4ea0e9de0ec98ba02.jpg")
+z <- tempfile()
+download.file(myurl,z,mode="wb")
+
+pic <- readJPEG(z)
+dim_pic <- dim(pic)
+t <- 0.2; nl <- length(300:460); pl <- length(440:520)
+
+# 다음 아래(문제 1에 해당)
+yr <- pic[300:460, 440:520, 1]
+yg <- pic[300:460, 440:520, 2]
+yb <- pic[300:460, 440:520, 3]
+
+t <- 0.2
+wr <- t * yr + (1 - t)*matrix(runif(length(yr)), nrow = nl, ncol = pl)
+wg <- t * yg + (1 - t)*matrix(runif(length(yg)), nrow = nl, ncol = pl)
+wb <- t * yb + (1 - t)*matrix(runif(length(yb)), nrow = nl, ncol = pl)
+
+
+pic[300:460, 440:520, 1] <- wr
+pic[300:460, 440:520, 2] <- wg
+pic[300:460, 440:520, 3] <- wb
+
+```
+
+
+<br/>
+```{r}
+require(tidyverse)
+require(jpeg)
+require(cowplot)
+
+myurl <- paste0("https://img.livescore.co.kr/data/editor/1906/", 
+                "ba517de8162d92f4ea0e9de0ec98ba02.jpg")
+z <- tempfile()
+download.file(myurl,z,mode="wb")
+
+pic <- readJPEG(z)
+dim_pic <- dim(pic)
+t <- 0.2; nl <- length(300:460); pl <- length(440:520)
+
+# pic 의 RGB값을 무작위로 샘플링 후 매개변수 t(0.2)로 노이즈 가중치 조절하기
+for(i in 1:3){pic[300:460, 440:520, i] <- t * pic[300:460, 440:520, i] + (1 - t)*matrix(runif(length( pic[300:460, 440:520, i])), nrow = nl, ncol = pl)}
+
+# pic 의 그림을 출력
+ggdraw() +
+  draw_image(pic)
+```
+
+**2. R에 기본으로 내장된 `mtcars` 데이터셋은 다음과 같이 11개의 변수로 구성되어 있다. **
+
+
+a) `mtcars`의 데이터 구조를 파악하고 자료의 전반적인 형태에 대해 기술 하시오. 
+
+
+<br/>
+```{r}
+# 데이터'mtcars' 의 구조 및 자료의 전반적인 형태 파악
+str(mtcars)
+```
+32개의 개체 11개의 변수로 구성된 데이터 프레임(data frame)형태의 데이터이며 각 변수에 해당하는 개체의 데이터 타입이 모두 수치형(numeric)이다.
+
+b) 위 코드북을 참고하여 엔진과 변속기어에 해당하는 변수를 factor로 변환 후 해당 데이터 프레임을 `df` 객체에 저장 하시오. 
+
+
+<br/>
+```{r}
+# 엔진과 변속기어에 해당하는 변수를 factor로 변환 후 df에 할당
+df <-within(mtcars, {
+  cyl <- factor(mtcars$cyl)
+  am <- factor(mtcars$am)
+})
+
+```
+
+
+c) `df` 데이터셋에서 변속기어 (`am`)에 따른 `mpg`, `disp`, `hp`, `drat`, `wt`, `qsec`에 대한 평균과 표준편차의 결과를 각각 `mtcar_mean`, `mtcar_std` 객제에 저장 후 확인하시오(Hint: `mean()`, `sd()` 함수 사용). 단 각 결과는 테이블 형태로 반환되어야 함(한 객체에 모든 변수의 평균 또는 표준편차가 저장. 결과가 테이블 객체의 반환을 의미하는 것은 아님). 
+
+
+<br/>
+```{r}
+# df 데이터셋에서 변속기어(am)에 따른  `mpg`, `disp`, `hp`, `drat`, `wt`, `qsec`에 대한 평균테이블 만들기
+mpg_mean <- tapply(df$mpg, df$am, mean)
+disp_mean <- tapply(df$disp, df$am, mean)
+hp_mean <- tapply(df$hp, df$am, mean)
+drat_mean <- tapply(df$drat, df$am, mean)
+wt_mean <- tapply(df$wt, df$am, mean)
+qsec_mean <- tapply(df$qsec, df$am, mean)
+
+# 위의 평균테이블을 mtcar_mean 객체에 저장 후 출력
+mtcar_mean <- list(mpg_mean = mpg_mean, disp_mean = disp_mean, hp_mean = hp_mean, drat_mean = drat_mean, wt_mean = wt_mean, qsec_mean = qsec_mean)
+mtcar_mean
+
+# df 데이터셋에서 변속기어(am)에 따른  `mpg`, `disp`, `hp`, `drat`, `wt`, `qsec`에 대한 표준편차테이블 만들기
+mpg_std <- tapply(df$mpg, df$am, sd)
+disp_std <- tapply(df$disp, df$am, sd)
+hp_std <- tapply(df$hp, df$am, sd)
+drat_std <- tapply(df$drat, df$am, sd)
+wt_std <- tapply(df$wt, df$am, sd)
+qsec_std <- tapply(df$qsec, df$am, sd)
+
+# 위의 표준편차테이블을 mtcar_std 객체에 저장 후 출력
+mtcar_std <- list(mpg_std = mpg_std, disp_std = disp_std, hp_std = hp_std, drat_std = drat_std, wt_std = wt_std, qsec_std = qsec_std)
+mtcar_std
+
+### 다음과 같은 방법으로도 구할 수 있다. (코드 전체를 드래그 후 실행해야함)
+
+# x 에 `mpg`, `disp`, `hp`, `drat`, `wt`, `qsec` 에 해당하는 열번호 할당
+x <- c(1,3:7)
+
+# df 데이터셋에서 변속기어 (am)에 따른 mpg, disp, hp, drat, wt, qsec에 대한 평균 테이블 생성 후 mtcar_mean 객체에 저장
+for(i in x){
+  mtcar_mean = tapply(df[,i], df$am, mean)
+  print(mtcar_mean)}
+
+# df 데이터셋에서 변속기어 (am)에 따른 mpg, disp, hp, drat, wt, qsec에 대한 표준편차 테이블 생성 후 mtcar_std 객체에 저장
+for(i in x){
+  mtcar_std = tapply(df[,i], df$am, sd)
+  print(mtcar_std)}
+
+```
+
+
+
+d) `df` 데이터셋을 엔진형태(`vs`) 별로 나눈 후, 연비를 종속변수($y$)로 놓고 무게(`wt`)를 독립변수로 사용한 일변량 회귀식을 반환 하시오. 
+
+<br/>
+```{r}
+# df 데이터셋을 엔진형태(vs) 별로 분할
+split(df, df$vs)
+
+# a 객체에는 vs==0인 데이터, b 객체에는 vs==1인 데이터 저장
+a <- subset(df, vs==0)
+b <- subset(df, vs==1)
+
+# 반응변수 : 연비(mpg), 설명변수 : 무게(wt) 로 하는 회귀계수 계산
+lm(wt ~ mpg, a)
+lm(wt ~ mpg, b)
+```
+(vs : 0) -> wt = -0.192*mpg + 6.879
+(vs : 1) -> wt = -0.1133*mpg + 5.3931
+
+
+**3. 1912년 4월 14일 타이타닉호 침몰 사고의 생존자 정보를 담고 있는 `titanic` 데이터셋은 통계학적으로 범주형 데이터 분석의 예시로서 널리 사용되고 있으며, 기계학습 및 데이터 과학 커뮤니티인 [Kaggle](https://kaggle.com)에서도 기계학습 알고리즘 경연을 위한 힉습자료로 활용되고 있다. 해당 데이터는 http://biostat.mc.vanderbilt.edu/wiki/pub/Main/DataSets/titanic3.csv 에서 다운로드가 가능하다. 타이타닉 데이터의 주요 변수에 대한 설명은 아래와 같다.** 
+
+
+
+a) 위 코드북의 내용을  `codebook_tit` 이란 데이터 프레임 객체에 저장 후 출력하시오. 
+
+
+<br/r>
+```{r}
+# 코드북의 내용을 각 객체(변수명,변수설명)에 할당
+`변수명` <- c("pclass", "survived", "name", "sex", "age", "sibsp", "parch", "ticket", "fare", "cabin", "embarked" )
+`변수설명(영문)` <- c("Passenger Class (1=1st; 2=2nd; 3=3rd)", "Survival (0=No; 1=Yes)", "Passenger name", "Sex", "Age", "# of siblings/spouses abroad", "# of parents/children abroad", "Ticket number", "Passenger fare", "Cabin", "Port of embarkation (C=Cherbourg; Q=Queenstown; S=Southhampton")
+`변수설명(국문)` <- c("선실 등급", "생존여부", "탑승객 성명", "성별", "나이", "동승한 형제/배우자 수", "동승한부모/자녀 수", "티켓번호", "티켓요금", "선실번호", "탑승 장소")
+
+#할당한 코드북의 내용을 codebook_tit 이란 데이터 프레임 객체에 저장 후 출력
+codebook_tit <- data.frame(`변수명`,`변수설명(영문)`,`변수설명(국문)`,
+                           stringsAsFactors = FALSE)
+codebook_tit
+```
+
+
+
+b) 위 URL 주소로부터 타이타닉 데이터 파일을 읽은 후 `titanic` 객체에 저장한 뒤 위 코드북(강의노트 문제 3에서 제시된 테이블)에서 제시한 변수(변수명)만 추출한 다음 `df_titanic`이란 객체에 저장한 결과에 대해 개괄적 형태 및 데이터 특성에 대해 기술하시오. 
+
+
+<br/>
+```{r}
+# URL 주소로부터 읽어온 데이터 파일을 titanic 객체에 저장
+titanic <- read.csv(file = "C:\\r-project\\r-programming\\docs\\HomeWork_3\\titanic3.csv")
+
+# df_titanic 이란 객체에 위 코드북에서 제시한 변수만 추출후 저장
+df_titanic <- titanic[,codebook_tit$`변수명`]
+
+# df_titanic 데이터에 대한 개괄적 형태 및 데이터 특성 확인
+str(df_titanic)
+```
+df_titanic 이란 객체에 저장된 데이터는 11개의 변수, 1309개의 개체로 구성된 데이터 프레임(data frame)형태의 데이터이며 각 변수에 해당하는 개체의 데이터 타입이 요인형(factor), 수치형(numeric,interge)으로 구성되어 있다. 
+
+
+c) `age` 변수에 포함된 결측값을 `age`의 전체 평균값으로 대체 하시오.
+
+
+
+
+<br/>
+```{r}
+
+# age 변수의 결측값을 제외한 전체 편균을 구한 뒤 그 평균값을 age 변수에 포함된 결측값에 할당
+df_titanic$age[is.na(df_titanic$age)] <- mean(df_titanic$age, na.rm = TRUE)
+
+```
+
+
+d) `df_titanic`에서 `age` 를 다음과 같이 그룹화 후 `age_group` 변수(factor)를 생성 하시오. 
+
+```{r, eval=FALSE}
+# 0 살 이상 15살 미만: Children
+# 15살 이상: Adult
+```
+
+
+
+
+<br/>
+```{r}
+# df_titanic 에서 age를 15살을 기준으로 그룹화 후 age_group 객체에 factor 형태로 저장 
+age_group <- factor(ifelse(df_titanic$age >= 15,"Adult","Children"))
+```
+
+
+e) 선실 등급에 따른 남녀 별 그리고 연령 집단 별 생존 빈도 및 비율에 대해 각각 테이블로 나타내시오. 
+
+
+
+<br/>
+```{r}
+# df_titanic 에 age_group 이란 새로운 변수 추가
+df_titanic$age_group <- age_group
+
+# 선실 등급별로 df_titanic 데이터를 추출 후 class라는 새로운 데이터 셋 생성
+class_1 <- subset(df_titanic,pclass==1)
+class_2 <- subset(df_titanic,pclass==2)
+class_3 <- subset(df_titanic,pclass==3)
+
+# 선실 등급에 따른 남녀 별 생존 비율
+prop.table(table(class_1$sex, class_1$survived),1)
+prop.table(table(class_2$sex, class_2$survived),1)
+prop.table(table(class_3$sex, class_3$survived),1)
+
+# 선실 등급에 따른 연령 집단 별 생존 비율
+prop.table(table(class_1$age_group, class_1$survived),1)
+prop.table(table(class_2$age_group, class_2$survived),1)
+prop.table(table(class_3$age_group, class_3$survived),1)
+
+### 다음과 같은 방법으로도 구할 수 있다. (코드 전체를 드래그 후 실행해야함)
+
+# 선실 등급에 따른 남녀 별 생존 비율
+for(i in 1:3){
+  prop <- prop.table(table(subset(df_titanic,pclass==i)$sex, subset(df_titanic,pclass==i)$survived),1)
+print(prop)}
+
+# 선실 등급에 따른 연련 집단 별 생존 비율
+for(i in 1:3){
+  prop <- prop.table(table(subset(df_titanic,pclass==i)$age_group, subset(df_titanic,pclass==i)$survived),1)
+  print(prop)}
+```
+
+
+**4. 아래와 같은 데이터셋이 주어졌을 때 **
+
+
+- Dataset #1 (2.10. 문제 4의 첫 번째 테이블)
+
+
+<br/>
+
+
+- Dataset #2 (2.10. 문제 4의 두 번째 테이블)
+
+
+
+
+a) Dataset #1에 해당하는 데이터를 `authors`, dataset #2에 해당하는 데이터를 `books` 에 저장한 객체를 생성 하시오(단, 데이터 프레임을 구성하는 모든 변수는 문자열 변수로 저장). 
+
+
+<br/>
+```{r}
+# Dataset #1에 해당하는 데이터를 데이터 프레임을 구성하는 모든 변수가 문자열 변수 이도록 authors 객체에 저장
+surname <- c("Tukey", "Venables", "Tierney", "Ripley", "McNeil")
+nationality <- c("US", "Australia", "US", "UK", "Australia")
+authors <- data.frame(surname, nationality, stringsAsFactors = FALSE)
+
+# Dataset #2에 해당하는 데이터를 데이터 프레임을 구성하는 모든 변수가 문자열 변수 이도록 books 객체에 저장
+name <- c("Tukey", "Venables", "Tierney", "Ripley", "Ripley", "McNeil", "R Core")
+title <- c("Exploratory Data Analysis", "Modern Applied Statistics …", "LISP-STAT", "Spatial Statistics", "Stochastic Simulation", "Interactive Data Analysis", "An Introduction to R")
+books <- data.frame(name, title, stringsAsFactors = FALSE)
+```
+
+
+b) 두 데이터 셋을 `authors` 기준으로 병합한 데이터셋을 생성하시오. 
+
+
+<br/>
+```{r}
+# 두 데이터 셋을 authors 기준으로 병합한 데이터셋 생성
+merge(authors, books, by.x = "surname", by.y = "name")
+```
+
+
+
+c) 두 데이터 셋의 모든 값들을 포함한 결함 데이터 셋을 생성 하시오. 
+```{r}
+# 두 데이터 셋의 모든 값들을 포함한 결함 데이터셋 생성
+merge(authors, books, by.x = "surname", by.y = "name", all = TRUE)
+```

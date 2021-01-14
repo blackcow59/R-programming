@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590307848537.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "200113526",
+    "id" : "5DDECE96",
+    "lastKnownWriteTime" : 1590395034,
+    "last_content_update" : 1590395034163,
+    "path" : "C:/r-project/R-programming/script/R_programming_5.2.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "411,32",
+        "scrollLine" : "381",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
